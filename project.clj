@@ -13,7 +13,9 @@
                  [com.101tec/zkclient "0.4"]
                  [com.yammer.metrics/metrics-core "2.2.0"]
                  [org.scala-lang/scala-library "2.10.1"]
-                 [net.sf.jopt-simple/jopt-simple "3.2"]]
+                 [net.sf.jopt-simple/jopt-simple "3.2"]
+                 [manifold "0.1.0-beta3"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
   :exclusions [javax.mail/mail
                javax.jms/jms
                com.sun.jdmk/jmxtools

@@ -1,10 +1,10 @@
-(ns clj-kafka.test.consumer.zk
-  (:use [expectations]
-        [clj-kafka.core :only (with-resource to-clojure)]
-        [clj-kafka.producer :only (producer send-messages message)]
-        [clj-kafka.test.utils :only (with-test-broker)])
-  (:require [clj-kafka.consumer.zk :as zk]
-            [clj-kafka.consumer.seq :as zks]))
+(ns clj-kafka.test.consumer.manifold
+  (:require [clj-kafka.consumer.manifold :refer [input-stream]]
+            [manifold.stream :as s]
+            [expectations :refer :all]
+            [clj-kafka.core :refer [with-resource to-clojure]]
+            [clj-kafka.producer :refer [producer send-messages message]]
+            [clj-kafka.test.utils :refer [with-test-broker]]))
 
 (def producer-config {"metadata.broker.list" "localhost:9999"
                       "serializer.class"     "kafka.serializer.DefaultEncoder"
@@ -31,12 +31,11 @@
 (defn send-and-receive
   [messages]
   (with-test-broker test-broker-config
-                    (with-resource [c (zk/consumer consumer-config)]
-                                   zk/shutdown
-                                   (let [p (producer producer-config)
-                                         s (zk/stream c "test" 1)]
+                    (with-resource [stream (input-stream consumer-config "test")]
+                                   s/close!
+                                   (let [p (producer producer-config)]
                                      (send-messages p messages)
-                                     (first (zks/kafka-seq s))))))
+                                     @(s/take! stream 1)))))
 
 (given (send-and-receive [(test-message)])
        (expect :topic "test"
